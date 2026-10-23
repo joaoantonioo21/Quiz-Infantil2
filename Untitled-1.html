@@ -1,0 +1,859 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Brusque</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100vw;
+            height: 100vh;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background-color: #fff9df;
+            position: relative;
+            isolation: isolate;
+            overflow: hidden;
+        }
+
+        .active {
+            display: flex;
+        }
+
+        #home {
+            background-image: url("./img/fundoinicio.png");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        #home::before,
+        #quiz::before,
+        #levelScreen::before,
+        #final::before {
+            content: "";
+            position: absolute;
+            inset: -20px;
+            z-index: -2;
+            background-image: var(--bg-image);
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            filter: none(12px);
+            transform: scale(1.05);
+        }
+
+        #home::after,
+        #quiz::after,
+        #levelScreen::after,
+        #final::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: rgba(255, 249, 223, 0.12);
+            pointer-events: none;
+        }
+
+        #home {
+            --bg-image: url("./img/fundoinicio.png");
+            background-color: #fff9df;
+            background-image: url("./img/fundoinicio.png");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .card {
+            width: 400px;
+            max-width: 90%;
+            background: rgb(251, 239, 193);
+            border-radius: 40px;
+            padding: 40px;
+            margin-top: 120px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            border: 6px solid #ad7f00;
+        }
+
+        input {
+            padding: 18px;
+            border-radius: 20px;
+            border: 4px solid #ad7f00;
+            outline: none;
+            font-size: 20px;
+            background: transparent;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        input::placeholder {
+            color: #6b5100;
+        }
+
+        button {
+            padding: 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 26px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+        }
+
+        .startBtn {
+            background: #1f7a13;
+            color: white;
+        }
+
+        #levelScreen {
+            --bg-image: url("./img/fundo.png");
+            background-image: url("./img/fundo.png");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .levelDecoration {
+            position: absolute;
+            font-size: 65px;
+            user-select: none;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .star1 {
+            top: 10%;
+            left: 10%;
+        }
+
+        .star2 {
+            top: 15%;
+            right: 12%;
+            animation-delay: 0.5s;
+        }
+
+        .star3 {
+            bottom: 12%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .star4 {
+            bottom: 10%;
+            right: 12%;
+            animation-delay: 1.5s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateY(-15px) rotate(5deg);
+            }
+        }
+
+        .levelBox {
+            width: 650px;
+            max-width: 88%;
+            padding: 40px 25px;
+            background: #fff9df;
+            border: 7px solid #ad7f00;
+            border-radius: 45px;
+            text-align: center;
+            box-shadow: 0 12px 0 #8a6200,
+                        0 18px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .levelEmoji {
+            font-size: 85px;
+            margin-bottom: 10px;
+        }
+
+        .levelBox h1 {
+            font-size: 55px;
+            margin-bottom: 15px;
+            color: #1f7a13;
+            text-shadow: 2px 2px #b7e8a4;
+        }
+
+        .levelBox p {
+            font-size: 25px;
+            line-height: 1.4;
+            color: #493500;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .levelProgress {
+            font-size: 21px;
+            color: #725400;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .arrow {
+            font-size: 65px;
+            line-height: 1;
+            color: #e88a00;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(10px);
+            }
+        }
+
+        .continueBtn {
+            margin-top: 15px;
+            padding: 18px 40px;
+            background: #1f7a13;
+            color: white;
+            border: 4px solid #14540d;
+            box-shadow: 0 6px 0 #14540d;
+        }
+
+        .continueBtn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #14540d;
+        }
+
+        #quiz {
+            --bg-image: url("./img/fundo.png");
+            background-image: url("./img/fundo.png");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .quizBox {
+            width: 1100px;
+            max-width: 95%;
+            text-align: center;
+        }
+
+        .question {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: max-content;
+            max-width: 90%;
+            font-size: 38px;
+            font-weight: bold;
+            color: black;
+            padding: 25px;
+            border: 6px solid #ad7f00;
+            border-radius: 30px;
+            background-color: white;
+        }
+
+        .questionCounter {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 21px;
+            font-weight: bold;
+            background: #fff9df;
+            border: 3px solid #ad7f00;
+            border-radius: 15px;
+            padding: 8px 18px;
+        }
+
+        .answers {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            margin-top: 100px;
+        }
+
+        .answer {
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .answer:hover {
+            transform: scale(1.05);
+        }
+
+        .answer img {
+            width: 330px;
+            height: 330px;
+            max-width: 28vw;
+            object-fit: contain;
+            border-radius: 25px;
+            border: 8px solid #ad7f00;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        #inicio {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            display: none;
+            z-index: 5;
+        }
+
+        #inicio button {
+            background: #ad7702;
+            color: white;
+            border: 2px solid black;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 22px;
+        }
+
+        #inicio button:hover {
+            background: #14540d;
+        }
+
+        #final {
+            --bg-image: url("./img/fim2.png");
+            background-image: url("./img/fim2.png");
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .finalBox {
+            background: rgb(251, 239, 193);
+            padding: 50px;
+            max-width: 90%;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            border: 6px solid #ad7f00;
+        }
+
+        .finalBox h1 {
+            font-size: 55px;
+            margin-bottom: 20px;
+            color: #1f7a13;
+        }
+
+        .feedback {
+            font-size: 35px;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .score {
+            font-size: 40px;
+            color: #003b8f;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .question {
+                top: 17%;
+                font-size: 25px;
+                padding: 15px;
+            }
+
+            .questionCounter {
+                top: 28%;
+                font-size: 16px;
+            }
+
+            .answers {
+                gap: 12px;
+                margin-top: 100px;
+            }
+
+            .answer img {
+                width: 28vw;
+                height: 28vw;
+                border-width: 4px;
+            }
+
+            #inicio button {
+                font-size: 15px;
+                padding: 10px 15px;
+            }
+
+            .levelBox h1 {
+                font-size: 38px;
+            }
+
+            .levelBox p {
+                font-size: 20px;
+            }
+
+            .levelEmoji {
+                font-size: 65px;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .card {
+                padding: 25px;
+            }
+
+            .question {
+                top: 20%;
+                font-size: 20px;
+            }
+
+            .questionCounter {
+                top: 33%;
+            }
+
+            .answers {
+                flex-direction: column;
+                margin-top: 130px;
+                gap: 8px;
+            }
+
+            .answer img {
+                width: 24vw;
+                height: 24vw;
+            }
+
+            .levelBox {
+                padding: 25px 15px;
+            }
+
+            .levelBox h1 {
+                font-size: 32px;
+            }
+
+            .levelBox p {
+                font-size: 17px;
+            }
+
+            .continueBtn {
+                font-size: 21px;
+                padding: 15px 25px;
+            }
+
+            .levelDecoration {
+                font-size: 40px;
+            }
+
+            .finalBox {
+                padding: 25px;
+            }
+
+            .finalBox h1 {
+                font-size: 35px;
+            }
+
+            .feedback {
+                font-size: 25px;
+            }
+
+            .score {
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="home" class="screen active">
+
+        <div class="card">
+            <input type="text" id="nome" placeholder="NOME">
+            <input type="text" id="escola" placeholder="ESCOLA">
+            <input type="number" id="idade" placeholder="IDADE">
+
+            <button class="startBtn" onclick="startGame()">
+                COMEÇAR!
+            </button>
+        </div>
+
+    </div>
+
+    <div id="levelScreen" class="screen">
+
+        <div class="levelDecoration star1">⭐</div>
+        <div class="levelDecoration star2">🌈</div>
+        <div class="levelDecoration star3">🌼</div>
+        <div class="levelDecoration star4">🎈</div>
+
+        <div class="levelBox">
+
+            <div class="levelEmoji" id="levelEmoji">🌟</div>
+
+            <h1 id="levelTitle">NÍVEL FÁCIL!</h1>
+
+            <p id="levelDescription">
+                Vamos começar com perguntas fáceis!
+            </p>
+
+            <div class="levelProgress" id="levelProgress">
+                1ª FASE • 5 PERGUNTAS
+            </div>
+
+            <div class="arrow">⬇️</div>
+
+            <button class="continueBtn" onclick="continueLevel()">
+                CONTINUAR ➜
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="quiz" class="screen">
+
+        <div class="quizBox">
+
+            <div class="question" id="question"></div>
+
+            <div class="questionCounter" id="questionCounter"></div>
+
+            <div class="answers" id="answers"></div>
+
+        </div>
+
+    </div>
+
+    <div id="inicio">
+        <button onclick="location.reload()">
+            VOLTAR AO INÍCIO
+        </button>
+    </div>
+
+    <div id="final" class="screen">
+
+        <div class="finalBox">
+
+            <h1>FIM DE JOGO!</h1>
+
+            <div class="feedback" id="feedback"></div>
+
+            <div class="score" id="score"></div>
+
+            <button class="startBtn" onclick="restartGame()">
+                JOGAR NOVAMENTE
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+        const questions = [
+
+            {
+                question: "QUAL DESSES OBJETOS SE USA PARA LER?",
+                answers: [
+                    { image: "./img/lapis.png", correct: false },
+                    { image: "./img/livro.png", correct: true },
+                    { image: "./img/carro.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES ITENS VOCÊ COLOCA NO PÉ?",
+                answers: [
+                    { image: "./img/bone.png", correct: false },
+                    { image: "./img/sapato.png", correct: true },
+                    { image: "./img/mochila.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES OBJETOS USAMOS PARA ESCREVER?",
+                answers: [
+                    { image: "./img/lapis2.png", correct: true },
+                    { image: "./img/borracha.png", correct: false },
+                    { image: "./img/tesoura.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES ALIMENTOS É UMA MAÇÃ?",
+                answers: [
+                    { image: "./img/laranja.png", correct: false },
+                    { image: "./img/banana.png", correct: false },
+                    { image: "./img/maca.png", correct: true }
+                ]
+            },
+
+            {
+                question: "QUAL CRIANÇA ESTÁ DE AZUL?",
+                answers: [
+                    { image: "./img/criancaazul.png", correct: true },
+                    { image: "./img/criancavermelho.png", correct: false },
+                    { image: "./img/criancaamarelo.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSAS FORMAS É UM TRIÂNGULO?",
+                answers: [
+                    { image: "./img/triangulo.png", correct: true },
+                    { image: "./img/circulo.png", correct: false },
+                    { image: "./img/quadrado.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL NÚMERO VEM DEPOIS DO NÚMERO 4?",
+                answers: [
+                    { image: "./img/3n.png", correct: false },
+                    { image: "./img/5n.png", correct: true },
+                    { image: "./img/6n.png", correct: false }
+                ]
+            },
+
+            {
+                question: "CLIQUE NA IMAGEM QUE POSSUI 3 BOLAS",
+                answers: [
+                    { image: "./img/2bolas.png", correct: false },
+                    { image: "./img/bolafutebol.png", correct: false },
+                    { image: "./img/3bolas.png", correct: true }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES PLANETAS É A TERRA?",
+                answers: [
+                    { image: "./img/saturno.png", correct: false },
+                    { image: "./img/terra.png", correct: true },
+                    { image: "./img/marte.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES ANIMAIS VIVE NA ÁGUA?",
+                answers: [
+                    { image: "./img/cachorro1.png", correct: false },
+                    { image: "./img/gato1.png", correct: false },
+                    { image: "./img/peixe.png", correct: true }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES ANIMAIS TEM CHIFRES?",
+                answers: [
+                    { image: "./img/vaca1.png", correct: true },
+                    { image: "./img/cachorro2.png", correct: false },
+                    { image: "./img/gato2.png", correct: false }
+                ]
+            },
+
+            {
+                question: "QUAL DESSES ANIMAIS VOA?",
+                answers: [
+                    { image: "./img/cachorro1.png", correct: false },
+                    { image: "./img/gato1.png", correct: false },
+                    { image: "./img/passaro.png", correct: true }
+                ]
+            },
+
+            {
+                question: "O QUE VOCÊ CONSEGUE VER NO CÉU À NOITE?",
+                answers: [
+                    { image: "./img/sol.png", correct: false },
+                    { image: "./img/bolabasquete.png", correct: false },
+                    { image: "./img/lua.png", correct: true }
+                ]
+            },
+
+            {
+                question: "O QUE VOCÊ USA PARA ESCOVAR OS DENTES?",
+                answers: [
+                    { image: "./img/carro2.png", correct: false },
+                    { image: "./img/bolapraia.png", correct: false },
+                    { image: "./img/escova.png", correct: true }
+                ]
+            },
+
+            {
+                question: "QUAL DESSAS BANDEIRAS É DO BRASIL?",
+                answers: [
+                    { image: "./img/bandeirabr.png", correct: true },
+                    { image: "./img/bandeiraeua.png", correct: false },
+                    { image: "./img/bandeiraarg.png", correct: false }
+                ]
+            }
+
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let currentLevel = 0;
+
+        const levels = [
+            {
+                title: "NÍVEL FÁCIL!",
+                description: "Vamos começar! Responda às perguntas e mostre o que você sabe!",
+                emoji: "🌟",
+                progress: "1ª FASE • 5 PERGUNTAS"
+            },
+            {
+                title: "NÍVEL MÉDIO!",
+                description: "Muito bem! Agora vamos aprender brincando com perguntas um pouquinho mais difíceis!",
+                emoji: "🚀",
+                progress: "2ª FASE • 5 PERGUNTAS"
+            },
+            {
+                title: "NÍVEL DIFÍCIL!",
+                description: "Você chegou longe! Prepare-se para o desafio final!",
+                emoji: "🏆",
+                progress: "3ª FASE • 5 PERGUNTAS"
+            }
+        ];
+
+        function startGame() {
+            document.getElementById("home").classList.remove("active");
+
+            currentQuestion = 0;
+            score = 0;
+            currentLevel = 0;
+
+            showLevelScreen();
+        }
+
+        function showLevelScreen() {
+            document.getElementById("quiz").classList.remove("active");
+            document.getElementById("final").classList.remove("active");
+            document.getElementById("levelScreen").classList.add("active");
+
+            document.getElementById("inicio").style.display = "none";
+
+            const level = levels[currentLevel];
+
+            document.getElementById("levelTitle").innerText = level.title;
+            document.getElementById("levelDescription").innerText = level.description;
+            document.getElementById("levelEmoji").innerText = level.emoji;
+            document.getElementById("levelProgress").innerText = level.progress;
+        }
+
+        function continueLevel() {
+            document.getElementById("levelScreen").classList.remove("active");
+            document.getElementById("quiz").classList.add("active");
+
+            document.getElementById("inicio").style.display = "block";
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+
+            document.getElementById("question").innerText = q.question;
+
+            const questionInLevel = (currentQuestion % 5) + 1;
+            const levelName = levels[currentLevel].title.replace("!", "");
+
+            document.getElementById("questionCounter").innerText =
+                levelName + " • PERGUNTA " + questionInLevel + "/5";
+
+            const answersDiv = document.getElementById("answers");
+
+            answersDiv.innerHTML = "";
+
+            q.answers.forEach(answer => {
+                const div = document.createElement("div");
+                div.classList.add("answer");
+
+                const img = document.createElement("img");
+                img.src = answer.image;
+                img.alt = "Alternativa do quiz";
+
+                div.appendChild(img);
+
+                div.onclick = () => checkAnswer(answer.correct);
+
+                answersDiv.appendChild(div);
+            });
+        }
+
+        function checkAnswer(correct) {
+            if (correct) {
+                score++;
+            }
+
+            currentQuestion++;
+
+            if (currentQuestion >= questions.length) {
+                showFinal();
+                return;
+            }
+
+            if (currentQuestion % 5 === 0) {
+                currentLevel++;
+                showLevelScreen();
+            } else {
+                loadQuestion();
+            }
+        }
+
+        function showFinal() {
+            document.getElementById("quiz").classList.remove("active");
+            document.getElementById("levelScreen").classList.remove("active");
+            document.getElementById("final").classList.add("active");
+
+            document.getElementById("inicio").style.display = "none";
+
+            document.getElementById("score").innerText =
+                "PONTUAÇÃO: " + score + "/" + questions.length;
+
+            let feedback = "";
+
+            if (score === questions.length) {
+                feedback = "🏆 INCRÍVEL! VOCÊ ACERTOU TUDO!";
+            } else if (score >= 11) {
+                feedback = "🎉 MUITO BEM! VOCÊ FOI DEMAIS!";
+            } else if (score >= 6) {
+                feedback = "😊 MUITO BOM! CONTINUE APRENDENDO!";
+            } else {
+                feedback = "🌟 QUASE LÁ! TENTE NOVAMENTE!";
+            }
+
+            document.getElementById("feedback").innerText = feedback;
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            currentLevel = 0;
+
+            document.getElementById("final").classList.remove("active");
+            document.getElementById("home").classList.add("active");
+
+            document.getElementById("inicio").style.display = "none";
+        }
+    </script>
+
+</body>
+</html>
